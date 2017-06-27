@@ -36,62 +36,49 @@ End Sub
 Private Sub m_BillInterface_Change(ByVal dct As KFO.IDictionary, ByVal dctFld As KFO.IDictionary, ByVal Col As Long, ByVal Row As Long, Cancel As Boolean)
  
     'TODO: 请在此处添加代码响应事件
-    
-    On Error GoTo ExitFun
-    With m_BillInterface
-        If (dct("FCaption") = "核算项目") Then
-            '获取下拉列表控件的Index
-            'Set dctTableInfo = m_BillInterface.TableInfo
-'            sKey = .TableInfo("Map")("FComboBox1")
-'            ICtlIndex = .TableInfo(sKey)("CtlIndex")
-'            Set oBill = m_BillInterface.BillCtl
-'            Call oBill.setcomboxlist(ICtlIndex, "VALUELIST{1=a,2=b,3=c}")
+    If (dct("FCaption") = "核算项目") Then
+        '对供应商名称变动事件处理
+        With m_BillInterface
+            '获取数据
+            Dim CMD As String
+            CMD = "SELECT TOP (1000) [FItemID], [F_105] ,[FName] FROM [AISCJCS].[dbo].[t_Item_3016] WHERE F_105=" + dctFld("FFLD")
+            Set rs = m_BillInterface.K3Lib.GetData(CMD)
+            '循环拼节字符串
+            Dim liststr As String
+            liststr = "VALUELIST{"
+            If (Not rs.EOF) Then
+                For I = 1 To rs.RecordCount
+                    On Error Resume Next
+                    liststr = liststr + CStr(rs("FItemID")) + "=" + rs("FName") + ","
+                    rs.MoveNext
+                Next
+            End If
+            liststr = liststr + "}"
             
-'            Dim CMD As String
-'            CMD = "SELECT TOP (1000) [F_105] ,[FName] FROM [AISCJCS].[dbo].[t_Item_3016] WHERE F_105=" + CStr(dctFld("FFLD"))
-'            Set rs = .K3Lib.GetData(CMD)
-'            If (rs.RecordCount > 0) Then
-'                .Data("page1")("_0064_FComboBox1").AddItem = "aabb"
-'                'a = .SetFieldValue("FComboBox1", rs.Fields("FName"))
-''                a = .SetFieldValue("FText5", rs.Fields("KHM"))  .data("page1")("_0064_FComboBox1").
-''                a = .SetFieldValue("FText2", rs.Fields("KHM_S"))
-''                a = .SetFieldValue("FText3", rs.Fields("KHYH_S"))
-''                a = .SetFieldValue("FText4", rs.Fields("YHZH_S"))
-'            Else
-'                MsgBox ("未找到对应核算项目！")
-'            End If
-
-
-        Dim dct As KFO.Dictionary
-        Dim dctPage As KFO.Dictionary
-        Dim oGrid As Object
-        dctPage("FPage") = 1
-        Set dctPage = New KFO.Dictionary
-        Set oGrid = m_BillInterface.BillCtl.GetObject("CTRL_GRID", dctPage)
-        Set dct = m_BillInterface.GetFieldInfoByKey("FComboxList1", "", 0)
-        Dim CMD As String
-        CMD = "SELECT TOP (1000) [F_105] ,[FName] FROM [AISCJCS].[dbo].[t_Item_3016] WHERE F_105=" + CStr(dctFld("FFLD"))
-        Set rs = .K3Lib.GetData(CMD)
-        Dim strList
-        If Not rs.EOF Then
-        For i = 1 To rs.Count
-        Str
-
-        
-
-        End If
-    End With
-GoTo ExitSub
-Catch:
-    'HandleError Err
-ExitSub:
-    Set obj = Nothing
-    Set oDataSrv = Nothing
-    Set objLookup = Nothing
-    Set dFilter = Nothing
-    Set rs = Nothing
-ExitFun:
-
+            '反写回下拉框
+            Dim oBill As Object
+            Dim ICtlIndex As Long
+            ICtlIndex = .TableInfo(.TableInfo("Map")("FComboBox1"))("CtlIndex")
+            
+            '此为隐藏函数，手册中没有
+            Call m_BillInterface.BillCtl.SetComboxList(ICtlIndex, liststr)
+        End With
+    ElseIf (dct("FCaption") = "收款账号") Then
+        '对下拉框变动事件处理
+        With m_BillInterface
+            '获取数据
+            CMD = "SELECT TOP 1 [F_102] ,[F_103],[F_104] FROM [AISCJCS].[dbo].[t_Item_3016] WHERE FItemID='" + dctFld("FFLD") + "'"
+            Set rs = .K3Lib.GetData(CMD)
+            '写入字段
+            a = .SetFieldValue("FText6", rs.Fields("F_102"))
+            a = .SetFieldValue("FText7", rs.Fields("F_103"))
+            a = .SetFieldValue("FText8", rs.Fields("F_104"))
+        End With
+    End If
+    
+    
+    '已知问题： 保存后在打开会导致下拉框无法选择，因为保存的是核算项目内码
+    '
 End Sub
 
 Private Sub m_BillTransfer_LoadBillEnd(ByVal ShowType As Long)

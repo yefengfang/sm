@@ -1,8 +1,8 @@
 Type=OleDll
 Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#C:\WINDOWS\system32\stdole2.tlb#OLE Automation
-Reference=*\G{C876CD0F-E4C2-11D5-9FA9-00E04C54B3B6}#3.d#0#C:\Program Files\Kingdee\K3ERP\K3Express\K3BILLTRANSFER.DLL#k3BillTransfer
-Reference=*\G{BD29F730-5BDA-11D1-9C2A-127658000000}#1.0#0#C:\Program Files\Kingdee\K3ERP\K3Express\KDSYSTEM\kfo10.dll#Kingdee Foundation Objects 1.0
-Reference=*\G{BA3A7E83-EF81-47BF-BE5B-99C294267B53}#4.3b#0#C:\Program Files\Kingdee\K3ERP\K3Express\K3CLASSEVENTS.DLL#K3ClassEvents
+Reference=*\G{C876CD0F-E4C2-11D5-9FA9-00E04C54B3B6}#3.d#0#D:\Program Files\Kingdee\K3ERP\K3Express\K3BILLTRANSFER.DLL#k3BillTransfer
+Reference=*\G{BD29F730-5BDA-11D1-9C2A-127658000000}#1.0#0#D:\Program Files\Kingdee\K3ERP\K3Express\KDSYSTEM\kfo10.dll#Kingdee Foundation Objects 1.0
+Reference=*\G{BA3A7E83-EF81-47BF-BE5B-99C294267B53}#4.3b#0#D:\Program Files\Kingdee\K3ERP\K3Express\K3CLASSEVENTS.DLL#K3ClassEvents
 Reference=*\G{00000205-0000-0010-8000-00AA006D2EA4}#2.5#0#C:\Program Files\Common Files\system\ado\msado25.tlb#Microsoft ActiveX Data Objects 2.5 Library
 Class=BOS_BillEvent_FKSQ; BOS_BillEvent_FKSQ.cls
 Class=Industry_XSDD; Industry_XSDD.cls

@@ -37,8 +37,29 @@ Public Function HookInvoke(ByVal EventID As Long, dctParams As KFO.Dictionary) A
             '--------------------------------------------------------
             
             '请在这里添加处理 '审核前' 代码
+            'conn sDsn
+            'billinter   InterID
+            '
+            '
+            '
+            '
 
- 
+            If (dctParams("OperateCode") = 1) Then
+                Set cn = New ADODB.Connection
+                cn.CursorLocation = adUseClient
+                connstr = Mid(dctParams("sDsn"), InStr(dctParams("sDsn"), "{") + 1, InStr(dctParams("sDsn"), "}") - (InStr(dctParams("sDsn"), "{") + 1))
+                cn.Open connstr
+                Dim sql As String
+                sql = "SELECT 1 From SEOrderEntry WHERE FPrice=0 AND FInterID=" + CStr(dctParams("InterID"))
+                Set rs = New ADODB.Recordset
+                rs.Open sql, cn
+                If rs.RecordCount > 0 Then
+                    MsgBox ("订单存在价格为0的分录，不允许审核！")
+                    HookInvoke = 0
+                Else
+                    HookInvoke = 1
+                End If
+            End If
     Case Else
     End Select
  

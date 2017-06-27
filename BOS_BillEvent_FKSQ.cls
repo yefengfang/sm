@@ -36,6 +36,7 @@ End Sub
 Private Sub m_BillInterface_Change(ByVal dct As KFO.IDictionary, ByVal dctFld As KFO.IDictionary, ByVal Col As Long, ByVal Row As Long, Cancel As Boolean)
  
     'TODO: 请在此处添加代码响应事件
+'查询语句
 '--SELECT
 '--  FItemID,
 '--  ISNULL(F_105,'') KHM,

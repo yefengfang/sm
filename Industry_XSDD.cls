@@ -36,19 +36,6 @@ End Sub
 Private Sub m_BillTransfer_HeadChange(ByVal CtlIndex As Long, ByVal Value As Variant, ByVal bNewBill As Boolean, Cancel As Boolean)
  
     'TODO: 请在此处添加代码响应事件 HeadChange
-    
-'SELECT
-'    I.FNumber,B.FSupplyID,SUM(BE.FConsignAmount) AS SBAmount,
-'    SUM(RB.FSettleAmount) AS RBAmount,
-'    (SUM(BE.FConsignAmount)-SUM(RB.FSettleAmount)) AS YSAmount
-'FROM ICStockBill AS B
-'INNER JOIN ICStockBillEntry AS BE ON B.FInterID=BE.FInterID
-'FULL JOIN t_RP_NewReceiveBill RB ON RB.FCustomer=B.FSupplyID
-'INNER JOIN t_Item AS I ON I.FItemID=ISNULL(B.FSupplyID,RB.FCustomer)
-'WHERE B.FTranType=21 AND I.FNumber=''
-'GROUP BY I.FNumber,B.FSupplyID
-
- 
     With m_BillTransfer
         On Error GoTo ExFun
         Set cn = New ADODB.Connection
@@ -56,48 +43,23 @@ Private Sub m_BillTransfer_HeadChange(ByVal CtlIndex As Long, ByVal Value As Var
         cn.Open .Cnnstring
         Set rs = New ADODB.Recordset
         Dim sql As String
-        sql = "" & _
-"SELECT" & _
-"    B.FSupplyID,SUM(BE.FConsignAmount) AS SBAmount, " & _
-"    SUM(RB.FSettleAmount) AS RBAmount, " & _
-"    (SUM(BE.FConsignAmount)-SUM(RB.FSettleAmount)) AS YSAmount " & _
-"FROM ICStockBill AS B " & _
-"INNER JOIN ICStockBillEntry AS BE ON B.FInterID=BE.FInterID " & _
-"FULL JOIN t_RP_NewReceiveBill RB ON RB.FCustomer=B.FSupplyID " & _
-"INNER JOIN t_Item AS I ON I.FItemID=ISNULL(B.FSupplyID,RB.FCustomer) " & _
-"WHERE B.FTranType=21 AND I.FNumber='" + Value + "' " & _
-"GROUP BY B.FSupplyID "
-
-        rs.Open sql, cn
         
         If (.m_HeadCtl(CtlIndex).Caption = "购货单位:") Then
-            'MsgBox ("SQL")
-            For i = LBound(.m_HeadCtl) To UBound(.m_HeadCtl)
-                If (.m_HeadCtl(i).Caption = "应收余款") Then
-                    r = .SetHead(i, rs("YSAmount"))
+            sql = "SELECT fendbalance FROM V_CustomerBalance WHERE FCustomer=" + CStr(.m_HeadCtl(CtlIndex).InterID)
+            rs.Open sql, cn
+            For I = LBound(.m_HeadCtl) To UBound(.m_HeadCtl)
+                If (.m_HeadCtl(I).Caption = "应收账款") Then
+                    r = .SetHead(I, rs("fendbalance"))
                     Exit For
                 End If
                 
             Next
         End If
-        
     End With
  
 ExFun:
-
-End Sub
-Private Sub m_BillTransfer_HookInvoke(ByVal pEventID As Long, Para As KFO.IDictionary)
- 
-    'TODO: 请在此处添加代码响应事件 HookInvoke
-    With m_BillTransfer
-    MsgBox ("Hello")
-        For i = LBound(.m_EntryCtl) To UBound(.m_EntryCtl)
-            If (.m_EntryCtl(i).Caption = "单价") Then
-                    MsgBox (i)
-                Exit For
-            End If
-        Next
-    End With
- 
+    Set rs = Nothing
+    cn.Close
+    Set cn = Nothing
 
 End Sub

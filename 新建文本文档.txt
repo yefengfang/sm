@@ -1,0 +1,99 @@
+有小伙伴问，在金蝶K3 BOS插件开发中，如何给下拉框动态赋值？想通过BOS集成开发工具简单配置是无法实现动态对下拉列表赋值的，只有进行插件开发才能实现您的需求...
+
+以下是插件中如何对单据头或者单据体字段进行动态赋值的示例代码，仅供参考：
+
+'插件中动态对单据头下拉列表字段赋值的处理：
+Private Sub m_BillInterface_AfterLoadBill()
+Dim oBill As Object
+Dim dctTableInfo As KFO.Dictionary
+Dim sKey As String
+Dim lCtlIndex As Long
+
+'先获取下拉列表控件的Index
+Set dctTableInfo = m_BillInterface.TableInfo
+sKey = dctTableInfo("Map")("FComboBox") 'FComboBox为下拉列表的关键字
+lCtlIndex = dctTableInfo(sKey)("CtlIndex")
+
+'再对控件的下拉列表进行赋值
+Set oBill = m_BillInterface.BillCtl
+Call oBill.SetComboxList(lCtlIndex, "VALUELIST{1=a,2=b,3=c}") '1表示保存值,a表示显示值
+m_BillInterface.SetFieldValue "FComboBox", "a", -1 '调用赋值函数赋值
+End Function
+
+'插件中动态对单据体下拉列表字段赋值的处理：
+Private Sub m_BillInterface_AfterLoadBill()
+Dim dct As KFO.Dictionary
+Dim dctPage As KFO.Dictionary
+Dim oGrid As Object
+
+Set dctPage = New KFO.Dictionary
+'要得到的单据体的Page
+dctPage("FPage") = 2
+'通过插件对象m_BillInterface获取到单据体控件对象
+Set oGrid = m_BillInterface.BillCtl.GetObject("CTRL_GRID", dctPage)
+'根据字段关键字(FComboxList)获取到要设置的下拉列表字段的模板，主要获取字段所在列：CtlIndex
+Set dct = m_BillInterface.GetFieldInfoByKey("FComboxList", "", 0)
+With oGrid
+.ReDraw = False
+.BlockMode = True
+.Col = dct("CtlIndex") '定位字段所在列
+.Col2 = dct("ctlIndex")
+.Row = 1
+.Row2 = .MaxRows '选择所有行
+.TypeComboBoxList = GetGridComboxList() '设置下拉列表值
+.BlockMode = False
+End With
+
+Set dct = Nothing
+Set dctPage = Nothing
+Set oGrid = Nothing
+End Function
+
+'拼接下拉列表值字符串
+Public Function GetGridComboxList() As String
+Dim i As Long
+Dim dctList As KFO.Dictionary
+Dim strList As String
+Dim rs As ADODB.Recordset
+
+strList = ""
+
+'第一种情况：没有可循环的数据包结构，自己构造循环数据包dctList
+'dctList("保存值")="显示值"
+Set dctList = New KFO.Dictionary
+dctList("1") = "广州市"
+dctList("2") = "深圳市"
+dctList("3") = "珠海市"
+'依此类推...
+For i = 1 To dctList.Count
+strList = strList & MakeComString(dctTmp(dctTmp.Name(i)), dctTmp.Name(i)) & VBA.Chr$(9)
+Next
+Set dctList = Nothing
+
+'第二种情况：本身有可循环的数据结构，例如RS记录集,则直接循环构造下拉列表字符串strList
+Set rs = m_BillInterface.GetData("SELECT FID,FName FROM t_Area WHERE FType=3")
+'MakeComString(显示值，保存值)
+If Not rs.EOF Then
+For i = 1 To rs.Count
+strList = strList & MakeComString(rs("FName"), rs("FID")) & VBA.Chr$(9)
+Next
+End If
+Set rs = Nothing
+
+GetGridComboxList = strList
+
+End Function
+
+'下拉列表字符串特定格式组合规则
+'@sFirst：显示值 @sSecond：保存值
+Public Function MakeComString(ByVal sFirst As String, ByVal sSecond As String) As String
+On Error Resume Next
+Dim strSPACE As String
+
+strSPACE = VBA.Space$(512)
+MakeComString = VBA.Left$(sFirst & strSPACE, VBA.Len(strSPACE)) & sSecond
+End Function
+
+备注：由于是动态赋值，在下拉表字段的模板中并不存在保存值与显示值的对应关系，在下次显示单据的时候，需要跟据保存值去动态的显示下拉表值（建议保存值和显示值保持一致）
+
+回复K或K3，查看更多金蝶二次开发解决方案...

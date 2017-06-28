@@ -1,5 +1,5 @@
-BOS_BillEvent_FKSQ = 187, 48, 1092, 582, Z
+BOS_BillEvent_FKSQ = 187, 48, 1092, 582, C
 Industry_XSDD = 189, 161, 1094, 695, 
 frm_StockLock = 140, 134, 1459, 772, C, 109, 46, 1252, 688, C
-Industry_StockLock = -305, 120, 1014, 762, C
-Industry_MiddlewareEvent_XSDD = -286, 79, 1033, 717, C
+Industry_StockLock = 147, 114, 1466, 756, 
+Industry_MiddlewareEvent_XSDD = 146, 19, 1465, 657, Z

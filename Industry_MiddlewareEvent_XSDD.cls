@@ -59,8 +59,11 @@ Public Function HookInvoke(ByVal EventID As Long, dctParams As KFO.Dictionary) A
                 Else
                     HookInvoke = 1
                 End If
+            Else
+                HookInvoke = 1
             End If
     Case Else
     End Select
  
 End Function
+' 已知问题：用0返回后系统会跳出调用失败的对话框

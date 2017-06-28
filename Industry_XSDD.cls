@@ -12,7 +12,11 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 Attribute VB_Description = "This is Industry Bill Interface Class, made by K3BOSPLUGINSWIZAED"
- 
+'
+' 功能说明： 采购订单获取应收账款
+' 备注：应收账款由数据库视图提供
+'
+
 '定义插件对象接口. 必须具有的声明, 以此来获得事件
 Private WithEvents m_BillTransfer   As K3BillTransfer.Bill
 Attribute m_BillTransfer.VB_VarHelpID = -1

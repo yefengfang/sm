@@ -14,6 +14,9 @@ Attribute VB_Exposed = True
 Attribute VB_Description = "This is IndustryMiddleWareEvents Interface Class, made by K3BOSPLUGINSWIZAED"
  
 Public Function HookInvoke(ByVal EventID As Long, dctParams As KFO.Dictionary) As Long
+'
+'   功能说明：不允许审核单价为0的销售订单
+'
  
     '定义插件对象接口. 必须具有的声明, 以此来获得事件
     '注意: 此方法必须存在, 请勿修改

@@ -65,5 +65,4 @@ ExFun:
     Set rs = Nothing
     cn.Close
     Set cn = Nothing
-
 End Sub

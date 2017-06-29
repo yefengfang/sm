@@ -1,6 +1,6 @@
 VERSION 5.00
 Object = "{CDE57A40-8B86-11D0-B3C6-00A0C90AEA82}#1.0#0"; "MSDATGRD.OCX"
-Begin VB.Form frm_StockLock 
+Begin VB.Form frm_LockStock 
    Caption         =   "锁库明晰"
    ClientHeight    =   7995
    ClientLeft      =   60
@@ -10,7 +10,7 @@ Begin VB.Form frm_StockLock
    ScaleHeight     =   7995
    ScaleWidth      =   13770
    StartUpPosition =   3  '窗口缺省
-   Begin VB.CommandButton Command3 
+   Begin VB.CommandButton bt_Close 
       Caption         =   "退出"
       Height          =   615
       Left            =   12000
@@ -18,7 +18,7 @@ Begin VB.Form frm_StockLock
       Top             =   2520
       Width           =   1335
    End
-   Begin VB.CommandButton Command2 
+   Begin VB.CommandButton bt_UnLock 
       Caption         =   "解锁"
       Height          =   615
       Left            =   12000
@@ -26,7 +26,7 @@ Begin VB.Form frm_StockLock
       Top             =   1560
       Width           =   1335
    End
-   Begin VB.CommandButton Command1 
+   Begin VB.CommandButton bt_LockStock 
       Caption         =   "锁库"
       Height          =   615
       Left            =   12000
@@ -164,11 +164,73 @@ Begin VB.Form frm_StockLock
       EndProperty
    End
 End
-Attribute VB_Name = "frm_StockLock"
+Attribute VB_Name = "frm_LockStock"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-Private Sub Form_Load()
-    'dg_djxx.Columns.Add (3)
+Private Sub bt_Close_Click()
+    Kill (App.Path & "\temp.txt")
+    Unload Me
 End Sub
+
+Private Sub Form_Load()
+    Dim obill() As String
+    Call ReadFile(obill)
+    
+End Sub
+Public Function ReadFile(obill() As String) As String
+    If Dir(App.Path & "\temp.txt") = "" Then
+    '不存在
+        MsgBox ("临时文件未找到，不能进行锁库！")
+        Unload Me
+    Else
+    '存在
+        Open (App.Path & "\temp.txt") For Input As #1
+        Dim text As String
+        Do While Not EOF(1)
+            Input #1, b
+            text = text & b
+        Loop
+        Close #1
+    End If
+        Dim s1() As String
+        Dim s2() As String
+        s1() = Split(text, "I")
+        ReDim bill(UBound(s1) - 1, 1) As String
+        For i = 1 To UBound(s1)
+            s2() = Split(s1(i), "E")
+            bill(i - 1, 0) = s2(0)
+            bill(i - 1, 1) = s2(1)
+        Next
+        
+        For i = 0 To UBound(s1)
+            MsgBox (bill(i, 0) + ":" + bill(i, 1))
+        Next
+    obill = bill
+End Function
+
+
+            
+        'ByVal sKey As String, oList As Object, ByRef bCancel As Boolean
+        '通过Set vectBill = oList.GetSelected 可以获取当前选中序时薄数据
+        
+        '返回记录集方式
+        'Set rs = obj.Execute("select * from t_icitem")
+        
+        '执行存储过程方式
+        ' obj.Execute3 ("exec KY_PlanQty")
+        
+        
+        
+        
+        
+        
+            'Dim vectBill As KFO.Vector
+    'Dim lmul As Long
+    ' Dim rs As ADODB.Recordset
+    'Dim InBatch As Form
+    'Set InBatch = New InBatch
+    
+    'Set OBJ = CreateObject("K3Connection.AppConnection")
+    

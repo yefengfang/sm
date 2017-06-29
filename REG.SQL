@@ -13,3 +13,16 @@ UPDATE t_DataFlowTimeStamp SET FName=FName
 --      FBandID为你要插入的位置（菜单，工具栏），
 --      FIndex为要插入的顺序，小左，大右，
 --      FComName为插件名称，前面要加" | "
+--查询语句
+SELECT
+	T.FName,
+	M.FBandID,
+	M.FIndex,
+	M.FToolID,
+	M.FComName,
+	B.FToolCaption
+FROM ICListTemplate AS T
+INNER JOIN t_BandToolMapping AS M ON T.FMenuID=M.FID
+INNER JOIN t_MenuToolBar AS B ON B.FToolID=M.FToolID
+WHERE T.FName LIKE '%销售订单%'
+ORDER BY T.FID,M.FBandID,M.FIndex,M.FToolID

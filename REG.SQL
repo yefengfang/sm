@@ -1,3 +1,6 @@
+--付款申请单
+--直接在BOS中调用
+
 --注册销售订单获取应收账款插件
 INSERT INTO t_ThirdPartyComponent VALUES(0,81,'SM.Industry_XSDD','','获取应收账款')
 --注册销售订单中间层插件

@@ -43,27 +43,27 @@ Private Sub m_BillInterface_HeadCtlClick(ByVal ctl As Object, ByVal dct As KFO.D
         With m_BillInterface
             Dim CMD As String
             sKey = .TableInfo("Map")("FCustomer")
-            CMD = "SELECT TOP (1000) [FItemID], [F_105] ,[FName] FROM [AISCJCS].[dbo].[t_Item_3016] WHERE F_105=" + .Data("Page1")(sKey)("FFLD")
+            CMD = "SELECT TOP (1000) [FItemID], [F_101] ,[FName] FROM [AISCJCS].[dbo].[t_Item_3016] WHERE F_101=" + .Data("Page1")(sKey)("FFLD")
             Set rs = m_BillInterface.K3Lib.GetData(CMD)
-            '循环拼节字符串
-            Dim liststr As String
-            liststr = "VALUELIST{"
-            If (Not rs.EOF) Then
-                For I = 1 To rs.RecordCount
-                    On Error Resume Next
-                    liststr = liststr + CStr(rs("FItemID")) + "=" + rs("FName") + ","
-                    rs.MoveNext
-                Next
+            If (rs.RecordCount > 0) Then
+                '循环拼节字符串
+                Dim liststr As String
+                liststr = "VALUELIST{"
+                If (Not rs.EOF) Then
+                    For I = 1 To rs.RecordCount
+                        On Error Resume Next
+                        liststr = liststr + CStr(rs("FItemID")) + "=" + rs("FName") + ","
+                        rs.MoveNext
+                    Next
+                End If
+                liststr = liststr + "}"
+    
+                '反写回下拉框
+                Dim ICtlIndex As Long
+                ICtlIndex = .TableInfo(.TableInfo("Map")("FComboBox1"))("CtlIndex")
+                '此为隐藏函数，手册中没有
+                Call m_BillInterface.BillCtl.SetComboxList(ICtlIndex, liststr)
             End If
-            liststr = liststr + "}"
-
-            '反写回下拉框
-            Dim ICtlIndex As Long
-            ICtlIndex = .TableInfo(.TableInfo("Map")("FComboBox1"))("CtlIndex")
-
-            '此为隐藏函数，手册中没有
-            Call m_BillInterface.BillCtl.SetComboxList(ICtlIndex, liststr)
-
         End With
     End If
 ExitSub1:

@@ -169,17 +169,79 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+Dim billinfo As New Adodb.Recordset
 Private Sub bt_Close_Click()
-    Kill (App.Path & "\temp.txt")
     Unload Me
 End Sub
 
 Private Sub Form_Load()
     Dim obill() As String
-    Call ReadFile(obill)
+    Dim connStr As String
+    '获取选择的单据内码和分录号
+    Call ReadFile(obill, connStr)
+    
+    '连接数据库
+    
+    Dim cn As New Adodb.Connection
+    cn.ConnectionString = connStr
+    cn.CursorLocation = adUseClient
+    cn.Open
+    
+    Dim CMD As New Adodb.Command
+    Dim sql As String
+    
+    sql = "" & _
+" SELECT" & _
+"     O.FBillNo AS FBillNo," & _
+"     I1.FName AS FCustName," & _
+"     ICI.FNumber AS FNumber," & _
+"     ICI.FName AS FName," & _
+"     U.FName AS FUnit," & _
+"     OE.FQty AS FQty," & _
+"     CASE WHEN ISNULL(L.FQty,0)>=OE.FQty THEN 'Y' ELSE '' END AS FLockState " & _
+" FROM SEOrder AS O " & _
+" INNER JOIN SEOrderEntry AS OE ON O.FInterID=OE.FInterID " & _
+" INNER JOIN t_Item AS I1 ON I1.FItemID=O.FCustID " & _
+" INNER JOIN t_ICItem AS ICI ON ICI.FItemID=OE.FItemID " & _
+" INNER JOIN t_MeasureUnit AS U ON U.FItemID=ICI.FUnitID " & _
+" LEFT JOIN t_LockStock AS L ON OE.FInterID=L.FInterID AND OE.FEntryID=L.FEntryID AND OE.FItemID=L.FItemID "
+
+    Dim where As String
+    where = makeWhere_orderbill(obill)
+'    Dim rs As New ADODB.Recordset
+'    CMD.CommandText = sql + where
+'    CMD.ActiveConnection = cn
+'
+'    Set billinfo = CMD.Execute
+    
+    Dim billinfo As New Adodb.Recordset
+    billinfo.Open sql + where, cn
+    
+    
+    'Set dg_djxx.DataSource = Nothing
+    Set dg_djxx.DataSource = billinfo
+
+
+   
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
 End Sub
-Public Function ReadFile(obill() As String) As String
+Public Function makeWhere_orderbill(arr() As String) As String
+    Dim where As String
+    where = " WHERE 1=0 "
+    For I = 0 To UBound(arr)
+        where = where + "OR (O.FInterID=" + arr(I, 0) + " AND OE.FEntryID=" + arr(I, 1) + ") "
+    Next
+End Function
+Public Function ReadFile(obill() As String, connStr As String) As String
     If Dir(App.Path & "\temp.txt") = "" Then
     '不存在
         MsgBox ("临时文件未找到，不能进行锁库！")
@@ -194,20 +256,35 @@ Public Function ReadFile(obill() As String) As String
         Loop
         Close #1
     End If
-        Dim s1() As String
-        Dim s2() As String
-        s1() = Split(text, "I")
-        ReDim bill(UBound(s1) - 1, 1) As String
-        For i = 1 To UBound(s1)
-            s2() = Split(s1(i), "E")
-            bill(i - 1, 0) = s2(0)
-            bill(i - 1, 1) = s2(1)
-        Next
-        
-        For i = 0 To UBound(s1)
-            MsgBox (bill(i, 0) + ":" + bill(i, 1))
-        Next
-    obill = bill
+    
+    Dim s1() As String
+    Dim s2() As String
+    s1() = Split(text, "I")
+    ReDim Bill(UBound(s1) - 1, 1) As String
+    
+    For I = 1 To UBound(s1)
+        s2() = Split(s1(I), "E")
+        Bill(I - 1, 0) = s2(0)
+        Bill(I - 1, 1) = s2(1)
+    Next
+    obill = Bill
+    
+    If Dir(App.Path & "\conn.txt") = "" Then
+    '不存在
+        MsgBox ("临时文件未找到，不能进行锁库！")
+        Unload Me
+    Else
+    '存在
+        connStr = ""
+        Open (App.Path & "\conn.txt") For Input As #1
+        Do While Not EOF(1)
+            Input #1, b
+            connStr = connStr & Split(b, "|")(0)
+        Loop
+        Close #1
+    End If
+    Kill (App.Path & "\temp.txt")
+    Kill (App.Path & "\conn.txt")
 End Function
 
 

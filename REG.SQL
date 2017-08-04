@@ -5,6 +5,9 @@
 INSERT INTO t_ThirdPartyComponent VALUES(0,81,'SM.Industry_XSDD','','获取应收账款')
 --注册销售订单中间层插件
 INSERT INTO t_ThirdPartyComponent VALUES(2,200001,2001,'SM.Industry_MiddlewareEvent_XSDD','','单价未零时不允许审核')
+
+--发货通知单中间层插件
+INSERT INTO t_ThirdPartyComponent VALUES(2,200001,2001,'SM.Industry_MiddlewareEvent_FHTZ','','发货通知单，可用数量不足时不允许审核')
 --付款申请单可在BOS注册
 --更新插件时间戳
 UPDATE t_DataFlowTimeStamp SET FName=FName

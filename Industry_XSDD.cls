@@ -51,9 +51,9 @@ Private Sub m_BillTransfer_HeadChange(ByVal CtlIndex As Long, ByVal Value As Var
         If (.m_HeadCtl(CtlIndex).Caption = "购货单位:") Then
             sql = "SELECT fendbalance FROM V_CustomerBalance WHERE FCustomer=" + CStr(.m_HeadCtl(CtlIndex).InterID)
             rs.Open sql, cn
-            For I = LBound(.m_HeadCtl) To UBound(.m_HeadCtl)
-                If (.m_HeadCtl(I).Caption = "应收账款") Then
-                    r = .SetHead(I, rs("fendbalance"))
+            For i = LBound(.m_HeadCtl) To UBound(.m_HeadCtl)
+                If (.m_HeadCtl(i).Caption = "应收账款") Then
+                    r = .SetHead(i, rs("fendbalance"))
                     Exit For
                 End If
                 

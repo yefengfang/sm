@@ -46,25 +46,40 @@ Public Function HookInvoke(ByVal EventID As Long, dctParams As KFO.Dictionary) A
             '
             '
             '
-
-            If (dctParams("OperateCode") = 1) Then
+            If (dctParams("OperateCode") = 1 And dctParams("TranType") = 81) Then
+            On Error GoTo UnknowError
                 Set cn = New ADODB.Connection
                 cn.CursorLocation = adUseClient
-                connstr = Mid(dctParams("sDsn"), InStr(dctParams("sDsn"), "{") + 1, InStr(dctParams("sDsn"), "}") - (InStr(dctParams("sDsn"), "{") + 1))
-                cn.Open connstr
+                connStr = Mid(dctParams("sDsn"), InStr(dctParams("sDsn"), "{") + 1, InStr(dctParams("sDsn"), "}") - (InStr(dctParams("sDsn"), "{") + 1))
+                cn.Open connStr
                 Dim sql As String
                 sql = "SELECT 1 From SEOrderEntry WHERE FPrice=0 AND FInterID=" + CStr(dctParams("InterID"))
                 Set rs = New ADODB.Recordset
                 rs.Open sql, cn
                 If rs.RecordCount > 0 Then
-                    MsgBox ("订单存在价格为0的分录，不允许审核！")
-                    HookInvoke = 0
+                    h = MsgBox("订单存在价格为0的分录，确定审核？", vbYesNo)
+                    If h = 6 Then
+                    
+                        HookInvoke = 1
+                    Else
+                        HookInvoke = 0
+                    End If
                 Else
                     HookInvoke = 1
                 End If
             Else
                 HookInvoke = 1
             End If
+            Err.Clear
+            Err.Number = 10000
+            Err.Description = "订单存在价格为0的分录，退出审核！"
+            GoTo ExitCase
+UnknowError:
+    Err.Clear
+    Err.Number = 10000
+    Err.Description = "未知错误，请联系管理员！"
+
+ExitCase:
     Case Else
     End Select
  

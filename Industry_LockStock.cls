@@ -19,13 +19,14 @@ Public Function MainFunction(ByVal sKey As String, oList As Object, ByRef bCance
     Select Case sKey
         Case "BathLockStock" '和你在数据库里插入的FNAME一样
             '配置文件内容
+            On Error GoTo err
             Dim text As String
             Dim connStr As String
             text = ""
             '读取被选择的单据内码和分录内码
-            For I = 1 To oList.ListSelectBillInfo.Size
-                text = text + "I" + CStr(oList.ListSelectBillInfo(I)("FInterID"))
-                text = text + "E" + CStr(oList.ListSelectBillInfo(I)("FEntryID"))
+            For i = 1 To oList.ListSelectBillInfo.Size
+                text = text + "I" + CStr(oList.ListSelectBillInfo(i)("FInterID"))
+                text = text + "E" + CStr(oList.ListSelectBillInfo(i)("FEntryID"))
             Next
             
             If Dir(App.Path & "\temp.txt") = "" Then
@@ -42,18 +43,25 @@ Public Function MainFunction(ByVal sKey As String, oList As Object, ByRef bCance
             End If
             
             connStr = oList.BaseInfo
+            connarr = Split(connStr, "|")
+            
             If Dir(App.Path & "\conn.txt") = "" Then
             '不存在
                 Open (App.Path & "\conn.txt") For Output As #1
-                Print #1, connStr
+                Print #1, connarr(0)
                 Close #1
             Else
             '存在
                 Kill (App.Path & "\conn.txt")
                 Open (App.Path & "\conn.txt") For Output As #1
-                Print #1, connStr
+                Print #1, connarr(0)
                 Close #1
             End If
-            frm_LockStock.Show vbModal
+            Shell App.Path & "\lockstock.exe", vbNormalFocus
+            GoTo quit
+err:
+            MsgBox ("文件写入错误！")
+quit:
     End Select
+    
 End Function

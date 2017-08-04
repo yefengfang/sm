@@ -22,11 +22,11 @@ Private WithEvents m_BillInterface  As BillEvent
 Attribute m_BillInterface.VB_VarHelpID = -1
  
 Public Sub Show(ByVal oBillInterface As Object)
- 
+
     'BillEvent 接口实现
     '注意: 此方法必须存在, 请勿修改
     Set m_BillInterface = oBillInterface
- 
+
 End Sub
 
 Private Sub Class_Terminate()
@@ -43,21 +43,21 @@ Private Sub m_BillInterface_HeadCtlClick(ByVal ctl As Object, ByVal dct As KFO.D
         With m_BillInterface
             Dim CMD As String
             sKey = .TableInfo("Map")("FCustomer")
-            CMD = "SELECT TOP (1000) [FItemID], [F_101] ,[FName] FROM [AISCJCS].[dbo].[t_Item_3016] WHERE F_101=" + .Data("Page1")(sKey)("FFLD")
+            CMD = "SELECT TOP (1000) [FItemID], [F_101] ,[FName] FROM t_Item_3016 WHERE F_101=" & .Data("Page1")(sKey)("FFLD")
             Set rs = m_BillInterface.K3Lib.GetData(CMD)
             If (rs.RecordCount > 0) Then
                 '循环拼节字符串
                 Dim liststr As String
                 liststr = "VALUELIST{"
                 If (Not rs.EOF) Then
-                    For I = 1 To rs.RecordCount
+                    For i = 1 To rs.RecordCount
                         On Error Resume Next
-                        liststr = liststr + CStr(rs("FItemID")) + "=" + rs("FName") + ","
+                        liststr = liststr & CStr(rs("FItemID")) & "=" & rs("FName") & ","
                         rs.MoveNext
                     Next
                 End If
-                liststr = liststr + "}"
-    
+                liststr = liststr & "}"
+
                 '反写回下拉框
                 Dim ICtlIndex As Long
                 ICtlIndex = .TableInfo(.TableInfo("Map")("FComboBox1"))("CtlIndex")
@@ -73,7 +73,7 @@ Private Sub m_BillInterface_Change(ByVal dct As KFO.IDictionary, ByVal dctFld As
     If (dct("FCaption") = "收款账号") Then
         With m_BillInterface
              '获取数据
-             CMD = "SELECT TOP 1 [F_102] ,[F_103],[F_104] FROM [AISCJCS].[dbo].[t_Item_3016] WHERE FItemID='" + dctFld("FFLD") + "'"
+             CMD = "SELECT TOP 1 [F_102] ,[F_103],[F_104] FROM t_Item_3016 WHERE FItemID='" & dctFld("FFLD") & "'"
              Set rs = .K3Lib.GetData(CMD)
              '写入字段
              If (rs.RecordCount > 0) Then
@@ -81,6 +81,18 @@ Private Sub m_BillInterface_Change(ByVal dct As KFO.IDictionary, ByVal dctFld As
                 a = .SetFieldValue("FText6", rs.Fields("F_102"))
                 a = .SetFieldValue("FText7", rs.Fields("F_103"))
                 a = .SetFieldValue("FText8", rs.Fields("F_104"))
+            End If
+        End With
+    ElseIf (dct("FCaption") = "核算项目") Then
+        With m_BillInterface
+            '获取供应商联系人和联系电话
+            CMD = "SELECT ISNULL(FContact,'') AS FContact,ISNULL(FPhone,'') AS FPhone FROM t_Supplier WHERE FItemID=" & dctFld("FFLD")
+            Set rs = .K3Lib.GetData(CMD)
+            If (rs.RecordCount > 0) Then
+            On Error GoTo ExitSub2:
+            a = .SetFieldValue("FText", rs.Fields("FContact"))
+            a = .SetFieldValue("FText2", rs.Fields("FPhone"))
+            a = .SetFieldValue("FText3", dctFld("FFND"))
             End If
         End With
     End If
